@@ -174,7 +174,6 @@ func (h *ClientConnInterfaceWrapper) Invoke(ctx context.Context, method string, 
 		return h.conn.Invoke(ctx, method, args, reply, opts...)
 	}
 
-	//fmt.Println(fmt.Sprintf("invoke %s local method call...", method))
 	l.RLock()
 	defer l.RUnlock()
 
