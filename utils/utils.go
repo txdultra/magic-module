@@ -27,7 +27,7 @@ func GetParam(ptr uintptr) (*ModuleParam, error) {
 	return &info, nil
 }
 
-func SetListenOn(ptr uintptr, listenOn string) {
+func ListenOn(ptr uintptr, listenOn string) {
 	str := (*string)(unsafe.Pointer(ptr))
 	*str = listenOn
 }
