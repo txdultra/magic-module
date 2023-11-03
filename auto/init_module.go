@@ -14,5 +14,5 @@ import "gitlab.cdfsunrise.com/architect/magic-module"
 
 func init() {
 
-	module.InitModules("")
+	txd.InitModules("")
 }

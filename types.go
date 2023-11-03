@@ -8,7 +8,7 @@
  *
  */
 
-package module
+package txd
 
 var ModuleCfgs ModuleConfig
 

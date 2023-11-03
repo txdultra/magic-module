@@ -8,7 +8,7 @@
  *
  */
 
-package module
+package txd
 
 import (
 	"fmt"
