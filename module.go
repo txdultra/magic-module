@@ -90,7 +90,8 @@ func magicLoadModule(pluginPath string, m *Module) {
 		fmt.Println("ListenAddr method not call:" + err.Error())
 	}
 
-	RegisterSrv(m.Name, m.ServiceKey, listenOn, lib, cShareType)
+	copyAddr := listenOn
+	RegisterSrv(m.Name, m.ServiceKey, copyAddr, lib, cShareType)
 
 	if m.Run {
 		runFn := lib.NewProc("Run")
