@@ -66,7 +66,7 @@ func InitModules(configPath string) {
 
 func magicLoadModuleWithConfig(m *Module) {
 	fileName := filepath.Base(m.ModulePath)
-	osModuleName := osModuleVersion(fileName)
+	osModuleName := osModuleVersion(fileName, false)
 	osModulePath := filepath.Join(filepath.Dir(m.ModulePath), osModuleName)
 	magicLoadModule(
 		osModulePath,
@@ -85,12 +85,15 @@ func magicLoadModule(pluginPath string, m *Module) {
 
 	listenAddrFn := lib.NewProc("ListenAddr")
 	var listenOn string
-	listenAddrFn.Call(uintptr(unsafe.Pointer(&listenOn)))
+	_, _, err = listenAddrFn.Call(uintptr(unsafe.Pointer(&listenOn)))
+	if err != nil {
+		fmt.Println("ListenAddr method not call:" + err.Error())
+	}
 
 	RegisterSrv(m.Name, m.ServiceKey, listenOn, lib, cShareType)
 
 	if m.Run {
-		runFn := lib.NewProc("RunModuleListen")
+		runFn := lib.NewProc("Run")
 		go runFn.Call()
 		if m.AfterLoadingWait > 0 {
 			time.Sleep(time.Duration(m.AfterLoadingWait) * time.Millisecond)
@@ -98,7 +101,7 @@ func magicLoadModule(pluginPath string, m *Module) {
 	}
 }
 
-func loadModule(pluginPath string, m *Module) {
+func loadModule(pluginPath, name, serviceKey string, args map[string]string, runListen bool) {
 	plu, err := plugin.Open(pluginPath)
 	if err != nil {
 		panic(err)
@@ -109,19 +112,24 @@ func loadModule(pluginPath string, m *Module) {
 		panic(err)
 	}
 	initModuleFn := initModule.(func(map[string]string))
-	initModuleFn(m.Args)
+	initModuleFn(args)
 
 	srv, err := plu.Lookup("Symbol")
 	if err != nil {
 		panic(err)
 	}
 
+	//wr, err := plu.Lookup("Write")
+	//wr.(func())()
+	//rd, err := plu.Lookup("Read")
+	//rd.(func())()
+
 	serv := reflect.ValueOf(srv).Elem().Interface()
-	RegisterSrv(m.Name, m.ServiceKey, "", serv, pluginType)
+	RegisterSrv(name, serviceKey, "", serv, pluginType)
 
 	// run
-	if m.Run {
-		run, err := plu.Lookup("Run")
+	if runListen {
+		run, err := plu.Lookup("RunModuleListen")
 		if err != nil {
 			panic(err)
 		}
@@ -144,17 +152,25 @@ func loadModuleWithName(name string) bool {
 
 func loadModuleWithConfig(m *Module) {
 	fileName := filepath.Base(m.ModulePath)
-	osModuleName := osModuleVersion(fileName)
+	osModuleName := osModuleVersion(fileName, true)
 	osModulePath := filepath.Join(filepath.Dir(m.ModulePath), osModuleName)
 	loadModule(
 		osModulePath,
-		m)
+		m.Name,
+		m.ServiceKey,
+		m.Args,
+		m.Run)
 }
 
-func osModuleVersion(fileName string) string {
+func osModuleVersion(fileName string, includeGoVersion bool) string {
 	arch := runtime.GOARCH
+	goos := runtime.GOOS
+
 	runtimeVersion := runtime.Version()
 	goVersion := strings.Replace(runtimeVersion, "go", "", -1)
 	withoutExt := fileName[:len(fileName)-len(filepath.Ext(fileName))]
-	return fmt.Sprintf("%s_%s_%s.so", withoutExt, arch, goVersion)
+	if !includeGoVersion {
+		return fmt.Sprintf("%s_%s_%s.so", withoutExt, goos, arch)
+	}
+	return fmt.Sprintf("%s_%s_%s_%s.so", withoutExt, goos, arch, goVersion)
 }
