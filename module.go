@@ -101,7 +101,7 @@ func magicLoadModule(pluginPath string, m *Module) {
 	}
 }
 
-func loadModule(pluginPath, name, serviceKey string, args map[string]string, runListen bool) {
+func loadPlugin(pluginPath, name, serviceKey string, args map[string]string, runListen bool) {
 	plu, err := plugin.Open(pluginPath)
 	if err != nil {
 		panic(err)
@@ -140,7 +140,7 @@ func loadModule(pluginPath, name, serviceKey string, args map[string]string, run
 	}
 }
 
-func loadModuleWithName(name string) bool {
+func loadPluginWithName(name string) bool {
 	for _, m := range ModuleCfgs.Modules {
 		if m.Name == name {
 			loadModuleWithConfig(m)
@@ -154,7 +154,7 @@ func loadModuleWithConfig(m *Module) {
 	fileName := filepath.Base(m.ModulePath)
 	osModuleName := osModuleVersion(fileName, true)
 	osModulePath := filepath.Join(filepath.Dir(m.ModulePath), osModuleName)
-	loadModule(
+	loadPlugin(
 		osModulePath,
 		m.Name,
 		m.ServiceKey,
