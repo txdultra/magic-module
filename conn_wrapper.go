@@ -25,7 +25,7 @@ type compType string
 
 const (
 	pluginType compType = "plugin"
-	cShareType compType = "cshare"
+	cShareType compType = "cshared"
 )
 
 type component struct {
@@ -90,7 +90,7 @@ func LazyModuleFuncInvoke(name string, funcName string, args ...any) []any {
 	defer l.Unlock()
 	srv, ok := components[name]
 	if !ok {
-		loadModuleWithName(name)
+		loadPluginWithName(name)
 	}
 
 	srv = components[name]
@@ -102,7 +102,7 @@ func LazyModule(name string) any {
 	defer l.Unlock()
 	srv, ok := components[name]
 	if !ok {
-		loadModuleWithName(name)
+		loadPluginWithName(name)
 		return components[name]
 	}
 	return srv
