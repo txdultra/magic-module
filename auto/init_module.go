@@ -10,7 +10,7 @@
 
 package auto
 
-import "gitlab.cdfsunrise.com/architect/magic-module"
+import txd "github.com/txdultra/magic-module"
 
 func init() {
 

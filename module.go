@@ -13,8 +13,8 @@ package txd
 import (
 	"fmt"
 	"github.com/ghodss/yaml"
-	"gitlab.cdfsunrise.com/architect/magic-module/magic"
-	"gitlab.cdfsunrise.com/architect/magic-module/utils"
+	"github.com/txdultra/magic-module/magic"
+	"github.com/txdultra/magic-module/utils"
 	"os"
 	"path/filepath"
 	"plugin"

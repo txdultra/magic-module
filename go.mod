@@ -1,4 +1,4 @@
-module gitlab.cdfsunrise.com/architect/magic-module
+module github.com/txdultra/magic-module
 
 go 1.20
 
